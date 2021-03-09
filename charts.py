@@ -15,7 +15,9 @@ class ChartsMain(BudgetMain):
         super().__init__()
         self.file_names: list = ['savings.csv', 'expenses.csv']
         self.root = Tk(className="Epic Budget Manager")
-        self.root.geometry("900x1080")
+        self.root.state('zoomed')
+        self.root.configure(background='white')
+        self.root.resizable(width=False, height=False)
 
     def __call__(self):
         try:
@@ -64,49 +66,61 @@ class ChartsMain(BudgetMain):
 
     def draw_savings_single_line_chart(self, **kwargs: list):
         savings_dates_for_graph = kwargs['savings_dates_for_graph']
-        savings_dates_for_graph_converted = [datetime.fromtimestamp(float(d)).strftime("%Y/%m/%d") for d in savings_dates_for_graph]
-        savings_s_l_fig = plt.Figure(figsize=(5, 6), dpi=100)
-        savings_s_l_ax = savings_s_l_fig.add_subplot(111)
-        savings_s_l = FigureCanvasTkAgg(savings_s_l_fig, self.root)
-        savings_s_l.get_tk_widget().pack(side=LEFT, anchor=NW)
-        savings_s_l_ax.plot(savings_dates_for_graph_converted, kwargs['savings_values_for_graph'], marker='o', color='green', linewidth=2)
-        savings_s_l_ax.set_title('Savings 2021')
-        savings_s_l_ax.set_ylim(ymin=0)
-        savings_s_l_ax.yaxis.grid()
-        savings_s_l_fig.tight_layout()
-
-    def draw_data_table(self, data_for_table: list):
-        data_table_fig = plt.Figure(figsize=(10.8, 4), dpi=100)
-        data_table_ax = data_table_fig.subplots()
-        data_table = FigureCanvasTkAgg(data_table_fig, self.root)
-        data_table.get_tk_widget().place(relx=0.48, rely=0.75, anchor=CENTER)
-        dt = pd.DataFrame(np.array(data_for_table), columns=list(['Cash movement', 'Dates']))
-        data_table_fig.patch.set_visible(False)
-        data_table_ax.axis('off')
-        data_table_ax.axis('tight')
-        data_table_ax.table(cellText=dt.values, colLabels=dt.columns, loc='center')
+        savings_dates_for_graph_converted = [datetime.fromtimestamp(float(d)).strftime("%y/%m/%d") for d in savings_dates_for_graph]
+        savings_single_line_fig = plt.Figure(figsize=(6, 6), dpi=100)
+        savings_single_line_ax = savings_single_line_fig.add_subplot(111)
+        savings_single_line = FigureCanvasTkAgg(savings_single_line_fig, self.root)
+        savings_single_line.get_tk_widget().pack(side=LEFT, anchor=NE)
+        savings_single_line_ax.plot(savings_dates_for_graph_converted, kwargs['savings_values_for_graph'], marker='o', color='green', linewidth=2)
+        savings_single_line_ax.set_title('Savings 2021')
+        savings_single_line_ax.set_ylim(ymin=0)
+        savings_single_line_ax.yaxis.grid()
+        savings_single_line_fig.tight_layout()
 
     def draw_pie_chart(self, **kwargs: list):
-        pie_fig = plt.Figure(figsize=(4, 6), dpi=100)
+        pie_fig = plt.Figure(figsize=(8, 6), dpi=100)
         pie_ax = pie_fig.subplots()
         pie_obj = FigureCanvasTkAgg(pie_fig, self.root)
-        pie_obj.get_tk_widget().pack(side=LEFT, anchor=NE)
+        pie_obj.get_tk_widget().place(relx=.5, rely=.295, anchor=CENTER)
         pie_values = [sum(kwargs['savings_values_for_graph']), sum(kwargs['expenses_values_for_graph']) * (-1)]
         pie_ax.pie(pie_values, labels=('Savings', 'Expense'), autopct='%1.1f%%', colors=['green', 'red'], startangle=90)
         pie_ax.axis('equal')
         pie_ax.set_title('Budget 2021')
 
+    def draw_savings_expenses_bar_chart(self, savings_values_bar_chart, expenses_values_for_bar_chart):
+        bar_savings_expenses_fig = plt.Figure(figsize=(6, 6), dpi=100)
+        bar_savings_expenses_ax = bar_savings_expenses_fig.subplots()
+        bar_savings_expenses = FigureCanvasTkAgg(bar_savings_expenses_fig, self.root)
+        bar_savings_expenses.get_tk_widget().place(relx=.85, rely=.295, anchor=CENTER)
+        bar_savings_expenses_ax.set_title("Savings & Expenses")
+        bar_savings_expenses_ax.axhline(y=0, linewidth=2, color='k')
+        bar_savings_expenses_ax.bar('Savings', sum(savings_values_bar_chart), width=0.1, label='Savings', color='green')
+        bar_savings_expenses_ax.bar('Expenses', sum(expenses_values_for_bar_chart), width=0.1, label='Expenses', color='red')
+
+    def draw_data_table(self, data_for_table: list):
+        data_table_fig = plt.Figure(figsize=(9, 3), dpi=100)
+        data_table_ax = data_table_fig.subplots()
+        data_table = FigureCanvasTkAgg(data_table_fig, self.root)
+        data_table.get_tk_widget().place(relx=.5, rely=.75, anchor=CENTER)
+        dt = pd.DataFrame(np.array(data_for_table), columns=list(['Dates', 'Value']))
+        data_table_fig.patch.set_visible(False)
+        data_table_ax.axis('off')
+        data_table_ax.axis('tight')
+        data_table_ax.set_title("Latest Revenue and Expenses", fontweight="bold", color='red')
+        data_table_ax.table(cellText=dt.values, colLabels=dt.columns, loc='center', colColours=["yellow"] * 2)
+
     def show_savings_and_expenses_buttons(self):
         buttons_font_size = font.Font(size=25)
-        savings_button = Button(self.root, command=self.add_income_to_budget, text='+', width=25, bg='#00cc00', fg='#ffffff')
-        expenses_button = Button(self.root, command=self.add_expense_to_budget, text='-', width=25, bg='#FF0000', fg='#ffffff')
-        savings_button.place(x=0, y=950)
-        expenses_button.place(x=450, y=950)
+        savings_button = Button(self.root, command=self.add_income_to_budget, text='+', width=26, bg='#00cc00', fg='#ffffff')
+        expenses_button = Button(self.root, command=self.add_expense_to_budget, text='-', width=26, bg='#FF0000', fg='#ffffff')
+        savings_button.place(x=450, y=950)
+        expenses_button.place(x=950, y=950)
         savings_button['font'], expenses_button['font'] = buttons_font_size, buttons_font_size
 
     def draw_elements(self, **kwargs: list):
-        self.draw_savings_single_line_chart(savings_values_for_graph=kwargs[f'savings_values_for_graph'], savings_dates_for_graph=kwargs['savings_dates_for_graph'])
-        self.draw_data_table(data_for_table=kwargs['data_for_table'])
         self.show_savings_and_expenses_buttons()
+        self.draw_data_table(data_for_table=kwargs['data_for_table'])
         self.draw_pie_chart(savings_values_for_graph=kwargs['savings_values_for_graph'], expenses_values_for_graph=kwargs['expenses_values_for_graph'])
+        self.draw_savings_single_line_chart(savings_values_for_graph=kwargs[f'savings_values_for_graph'], savings_dates_for_graph=kwargs['savings_dates_for_graph'])
+        self.draw_savings_expenses_bar_chart(savings_values_bar_chart=kwargs['savings_values_for_graph'], expenses_values_for_bar_chart=kwargs['expenses_values_for_graph'])
         self.root.mainloop()
