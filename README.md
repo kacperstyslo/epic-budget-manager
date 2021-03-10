@@ -15,5 +15,5 @@ python3 manager.py
 ```
 
 ## Application view
-![budget](https://user-images.githubusercontent.com/57534862/110494647-17868700-80f4-11eb-9b0c-3ae3e3ab89e6.PNG)
+![Charts](https://user-images.githubusercontent.com/57534862/110639675-482bf680-81b0-11eb-8b59-425c7ee1ab7c.PNG)
 
