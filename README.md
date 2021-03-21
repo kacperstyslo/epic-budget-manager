@@ -13,6 +13,10 @@ python manager.py
 On Linux:
 python3 manager.py
 ```
+## Tools Used
+* Python
+* Pandas
+* Numpy
 
 ## Application view
 ![Charts](https://user-images.githubusercontent.com/57534862/110639675-482bf680-81b0-11eb-8b59-425c7ee1ab7c.PNG)
