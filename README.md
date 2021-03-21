@@ -6,7 +6,7 @@ A small project to manage budget that helped me to get the basic knowledge of tk
 ## Requirements
 Python 3.5+
 
-## Using
+## Start-up
 ```commandline
 On Windows:
 python manager.py
